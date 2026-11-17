@@ -57,13 +57,16 @@ class _ReceiveTabState extends State<ReceiveTab> {
     final serverState = context.watch(serverProvider);
     final localIps = context.watch(localIpProvider.select((s) => s.localIps));
 
+    // Compact layout for short screens (small hardware panels, landscape phones).
+    final smallUi = MediaQuery.sizeOf(context).height < 500;
+
     return Stack(
       children: [
         Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: ResponsiveListView.defaultMaxWidth),
             child: Padding(
-              padding: const EdgeInsets.all(30),
+              padding: EdgeInsets.all(smallUi ? 15 : 30),
               child: ColumnListView(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -81,21 +84,21 @@ class _ReceiveTabState extends State<ReceiveTab> {
                               return RotatingWidget(
                                 duration: const Duration(seconds: 15),
                                 spinning: serverState != null && animations && activeTab == HomeTab.receive,
-                                child: const LocalSendLogo(withText: false),
+                                child: LocalSendLogo(withText: false, size: smallUi ? 90 : 200),
                               );
                             },
                           ),
                         ),
                         FittedBox(
                           fit: BoxFit.scaleDown,
-                          child: Text(serverState?.alias ?? alias, style: const TextStyle(fontSize: 48)),
+                          child: Text(serverState?.alias ?? alias, style: TextStyle(fontSize: smallUi ? 28 : 48)),
                         ),
                         InitialFadeTransition(
                           duration: const Duration(milliseconds: 300),
                           delay: const Duration(milliseconds: 500),
                           child: Text(
                             serverState == null ? t.general.offline : localIps.map((ip) => '#${ip.visualId}').toSet().join(' '),
-                            style: const TextStyle(fontSize: 24),
+                            style: TextStyle(fontSize: smallUi ? 16 : 24),
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -148,10 +151,11 @@ class _CornerButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final smallUi = MediaQuery.sizeOf(context).height < 500;
     return Align(
       alignment: Alignment.topRight,
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(smallUi ? 10 : 20),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
