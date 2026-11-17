@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.2
+
+- Added small-screen adaptation: on viewports whose shorter side is below 360 logical pixels (e.g. 308x240 hardware panels), the whole app is rendered on a virtual canvas and scaled down to fit, so all screens, buttons and menus stay fully visible and usable.
+- The receive tab now uses a compact layout on short screens (small panels and landscape phones), fixing the logo/alias/button overflow.
+
 ## 1.0.1
 
 - Fixed the startup crash on Android 5.x/6.x (`cannot locate symbol "getifaddrs"`): network interfaces are now enumerated via netlink on Android instead of `getifaddrs(3)`, which only exists since Android 7.0 (API 24).
