@@ -117,3 +117,21 @@ Future<int> openFileForWritingAndroid({required String uri}) async {
   }
   return fileDescriptor;
 }
+
+/// Creates (or updates) a notification channel with [importance] as the raw
+/// Android importance (e.g. 2 = IMPORTANCE_LOW).
+///
+/// Must run before the foreground service starts: on some Android 8.x builds the
+/// flutter_foreground_task plugin crashes while looking up the missing channel
+/// (see foreground_service.dart), so the channel has to exist already.
+Future<void> createNotificationChannelAndroid({
+  required String id,
+  required String name,
+  required int importance,
+}) async {
+  await _methodChannel.invokeMethod('createNotificationChannel', {
+    'id': id,
+    'name': name,
+    'importance': importance,
+  });
+}

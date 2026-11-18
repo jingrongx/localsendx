@@ -2,6 +2,8 @@ package io.github.jingrongx.localsend
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
@@ -107,6 +109,8 @@ class MainActivity : FlutterActivity() {
                 "openFileForWriting" -> handleOpenFileForWriting(call, result)
 
                 "scanFile" -> handleScanFile(call, result)
+
+                "createNotificationChannel" -> handleCreateNotificationChannel(call, result)
 
                 "openContentUri" -> {
                     openUri(context, call.argument<String>("uri")!!)
@@ -322,6 +326,41 @@ class MainActivity : FlutterActivity() {
             result.error("PERMISSION_DENIED", e.message ?: "Permission denied for content URI", null)
         } catch (e: Exception) {
             result.error("OPEN_FAILED", e.message ?: "Failed to open content URI", null)
+        }
+    }
+
+    /// Creates (or updates) the notification channel used by the transfer-progress
+    /// foreground service before flutter_foreground_task starts it.
+    ///
+    /// Some Android 8.x builds (e.g. MTK) throw a NullPointerException inside
+    /// NotificationManager.getNotificationChannel() when the channel does not exist
+    /// yet, which crashes the foreground service before it can call startForeground()
+    /// and takes the whole app down. Creating the channel up front and unconditionally
+    /// (createNotificationChannel is idempotent) keeps the plugin away from that query.
+    private fun handleCreateNotificationChannel(call: MethodCall, result: MethodChannel.Result) {
+        val id = call.argument<String>("id")
+        val name = call.argument<String>("name")
+        val importance = call.argument<Int>("importance")
+        if (id == null || name == null || importance == null) {
+            result.error("INVALID_ARGUMENT", "Missing channel id, name or importance", null)
+            return
+        }
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            result.success(null)
+            return
+        }
+
+        try {
+            val channel = NotificationChannel(id, name, importance).apply {
+                enableVibration(false)
+                setSound(null, null)
+                setShowBadge(false)
+            }
+            getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
+            result.success(null)
+        } catch (e: Exception) {
+            result.error("CHANNEL_CREATE_FAILED", e.message ?: "Failed to create the notification channel", null)
         }
     }
 

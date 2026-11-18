@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import 'package:localsend_isolates/util/android_channel.dart';
 import 'package:localsend_isolates/util/future_queue.dart';
 import 'package:logging/logging.dart';
 
@@ -67,6 +68,21 @@ class ForegroundService {
 
       await _requestNotificationPermission();
       _init(channelName: channelName);
+
+      // The plugin creates the channel itself, but some Android 8.x builds throw when
+      // it looks up the missing channel and the service dies before startForeground(),
+      // crashing the whole app. Creating it here (createNotificationChannel is
+      // idempotent) makes the plugin's lookup find an existing channel. A failure must
+      // not block the transfer, so it is only logged.
+      try {
+        await createNotificationChannelAndroid(
+          id: _channelId,
+          name: channelName,
+          importance: NotificationChannelImportance.LOW.rawValue,
+        );
+      } catch (e, st) {
+        _logger.warning('Could not create the notification channel', e, st);
+      }
 
       final result = await FlutterForegroundTask.startService(
         serviceId: _serviceId,
