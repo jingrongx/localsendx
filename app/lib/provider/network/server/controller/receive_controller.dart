@@ -663,10 +663,10 @@ class ReceiveController {
     // notify sender
     final target = session.sender;
     try {
+      // ignore: unawaited_futures
       server.ref
           .read(httpProvider)
           .pinnedTo(target.fingerprint)
-          // ignore: unawaited_futures
           .cancel(
             protocol: target.getProtocolType(),
             ip: target.ip!,

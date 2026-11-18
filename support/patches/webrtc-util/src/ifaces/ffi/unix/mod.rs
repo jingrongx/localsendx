@@ -9,7 +9,7 @@ use std::net::SocketAddr;
 
 #[cfg(not(target_os = "android"))]
 mod nix_impl {
-    use super::{Interface, Kind, NextHop};
+    use crate::ifaces::{Interface, Kind, NextHop};
     use nix::sys::socket::{AddressFamily, SockaddrLike, SockaddrStorage};
     use std::io::Error;
     use std::net::{SocketAddr, SocketAddrV4, SocketAddrV6};
