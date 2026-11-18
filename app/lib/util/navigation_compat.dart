@@ -29,7 +29,11 @@ class NavigationPopUntilRootAction extends BaseNavigationPopAction {
 class NavigationPopUntilAction<T> extends BaseNavigationPopAction {
   @override
   void reduce() {
-    ref.read(navigationProvider).key.currentState?.popUntil((route) => route.settings.name == T.toString());
+    // Falls back to the root route when no page of type [T] is on the stack,
+    // matching refena_flutter 3.5 (`NavigationService.popUntil`). Without the
+    // fallback, e.g. `popUntil<WebSharePage>()` on a regular receive flow
+    // popped the root route and left the navigator empty (black screen).
+    ref.read(navigationProvider).key.currentState?.popUntil((route) => route.settings.name == T.toString() || route.isFirst);
   }
 
   @override
