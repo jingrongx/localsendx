@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.4
+
+- Fixed the crash at the start of every transfer on some Android 8.x devices (e.g. MediaTek): the system throws while the foreground service looks up its not-yet-created notification channel, and the app is killed before any file can be sent or received. The notification channel is now created up front, before the service starts.
+
 ## 1.0.3
 
 - Fixed a crash on finishing a transfer (sending, receiving files, and copying a received message): closing the receive/progress page could pop the root route and leave the navigator empty (black screen / force close). The `popUntil` navigation backport now falls back to the root route, matching refena_flutter 3.5.
