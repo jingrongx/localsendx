@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.3
+
+- Fixed a crash on finishing a transfer (sending, receiving files, and copying a received message): closing the receive/progress page could pop the root route and leave the navigator empty (black screen / force close). The `popUntil` navigation backport now falls back to the root route, matching refena_flutter 3.5.
+
 ## 1.0.2
 
 - Added small-screen adaptation: on viewports whose shorter side is below 360 logical pixels (e.g. 308x240 hardware panels), the whole app is rendered on a virtual canvas and scaled down to fit, so all screens, buttons and menus stay fully visible and usable.
